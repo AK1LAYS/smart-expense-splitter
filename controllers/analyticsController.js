@@ -122,6 +122,39 @@ const AnalyticsController = {
         error: 'Failed to calculate summary: ' + error.message
       });
     }
+  },
+
+  // GET /api/categories
+  getCategories: (req, res) => {
+    try {
+      const expenses = ExpenseModel.getAllExpenses();
+      const categoryMap = {};
+
+      expenses.forEach(e => {
+        const cat = e.category || 'Other';
+        const amt = parseFloat(e.amount) || 0;
+        if (amt > 0) {
+          categoryMap[cat] = Math.round(((categoryMap[cat] || 0) + amt) * 100) / 100;
+        }
+      });
+
+      const categories = Object.entries(categoryMap)
+        .filter(([_, amount]) => amount > 0)
+        .map(([category, amount]) => ({
+          category,
+          amount
+        }));
+
+      res.status(200).json({
+        success: true,
+        categories
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve categories: ' + error.message
+      });
+    }
   }
 };
 

@@ -321,6 +321,22 @@ describe('Smart Expense Splitter - Comprehensive API Test Suite', () => {
     });
   });
 
+  // Test 10c: Expense Categories Endpoint Check
+  describe('GET /api/categories', () => {
+    it('10c. should return category-wise expense breakdown list', async () => {
+      const res = await request(app).get('/api/categories');
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(Array.isArray(res.body.categories)).toBe(true);
+      expect(res.body.categories).toEqual([
+        {
+          category: 'Food',
+          amount: 800
+        }
+      ]);
+    });
+  });
+
   // Test 11: 404 Route handling
   describe('404 Route Handling', () => {
     it('11. should return 404 JSON for unknown API paths', async () => {

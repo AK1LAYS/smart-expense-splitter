@@ -13,4 +13,7 @@ router.get('/analytics', AnalyticsController.getAnalytics);
 // GET /api/summary - Get expense summary (totalExpenses, totalMembers)
 router.get('/summary', AnalyticsController.getSummary);
 
+// GET /api/categories - Get category-wise expense analytics
+router.get('/categories', AnalyticsController.getCategories);
+
 module.exports = router;
