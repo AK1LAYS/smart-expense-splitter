@@ -1,0 +1,43 @@
+name: Smart Expense Splitter CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master", "develop" ]
+
+jobs:
+  build-and-test:
+    name: Build, Test & Docker Image Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 1. Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ 2. Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 3. Install Dependencies
+        run: npm ci || npm install
+
+      - name: 🧪 4. Run Jest Test Suite & Coverage
+        run: npm test
+
+      - name: 🐳 5. Build Docker Image
+        run: |
+          docker build -t smart-expense-splitter:${{ github.sha }} -t smart-expense-splitter:latest .
+
+      - name: 🚀 6. Test Container Startup & Healthcheck
+        run: |
+          docker run -d --name test-app -p 3000:3000 smart-expense-splitter:latest
+          sleep 5
+          curl -f http://localhost:3000/health || exit 1
+          docker stop test-app
+
+      - name: ✅ 7. Pipeline Success Notification
+        if: success()
+        run: echo "🎉 CI Pipeline Passed Successfully! Ready for Render Cloud Deployment."

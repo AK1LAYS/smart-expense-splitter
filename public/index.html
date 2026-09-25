@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SplitSmart &middot; Smart Expense Splitter &amp; Settlement Engine</title>
+
+  <!-- Google Fonts: Inter, Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome 6.5 -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dark-fintech">
+  <!-- Dynamic Ambient Mesh Glow Background -->
+  <div class="ambient-mesh" aria-hidden="true">
+    <div class="glow-orb orb-primary"></div>
+    <div class="glow-orb orb-secondary"></div>
+    <div class="glow-orb orb-lime"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- ================= 1. TOP NAVIGATION ================= -->
+  <header class="site-nav-wrapper" id="siteNav">
+    <div class="nav-container">
+      <a href="#top" class="nav-brand" id="brandHomeLink">
+        <span class="brand-bars">
+          <i></i><i></i><i></i>
+        </span>
+        <span class="brand-name">SplitSmart<span class="brand-dot">.</span></span>
+      </a>
+
+      <!-- Current Room Badge in Nav (ROOM-XXXXXX) -->
+      <div class="nav-room-badge" id="navRoomBadge" style="display: none;">
+        <span class="room-pulse-dot"></span>
+        <span class="room-pill-label">Room:</span>
+        <strong id="navRoomCodeText">ROOM-DEMO</strong>
+        <button type="button" class="btn-nav-action-icon" id="navCopyRoomLinkBtn" title="Copy Invite Link">
+          <i class="fa-solid fa-link"></i>
+        </button>
+        <button type="button" class="btn-nav-action-icon" id="navShareRoomBtn" title="Share Room">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
+      </div>
+
+      <nav class="desktop-nav" id="desktopNavLinks" aria-label="Main Navigation">
+        <a href="#rooms" class="nav-link nav-gateway-link">Rooms</a>
+        <a href="#features" class="nav-link nav-gateway-link">Capabilities</a>
+        <a href="#security" class="nav-link nav-gateway-link">Security</a>
+        <a href="#workspace" class="nav-link nav-workspace-link" style="display: none;">Dashboard</a>
+        <a href="#members-section" class="nav-link nav-workspace-link" style="display: none;">Members</a>
+        <a href="#settlement" class="nav-link nav-workspace-link" style="display: none;">Settlement</a>
+        <a href="#insights" class="nav-link nav-workspace-link" style="display: none;">Insights</a>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Landing Nav Actions -->
+        <div class="landing-nav-actions" id="landingNavActions">
+          <button type="button" class="btn-ghost-nav hide-small" id="navJoinScrollBtn">
+            <span>Join a room</span>
+            <i class="fa-solid fa-arrow-up-right"></i>
+          </button>
+          <button type="button" class="button primary hide-small" id="navCreateScrollBtn">
+            <span>Create room</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- In-Room Workspace Nav Actions -->
+        <div class="workspace-nav-actions" id="workspaceNavActions" style="display: none;">
+          <button type="button" class="btn-ghost-nav" id="navSwitchRoomBtn" title="Switch Room">
+            <i class="fa-solid fa-repeat"></i>
+            <span>Switch</span>
+          </button>
+          <button type="button" class="btn-ghost-nav btn-danger-text" id="navLeaveRoomBtn" title="Leave Room">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>Leave</span>
+          </button>
+          <button type="button" class="button primary" id="navAddExpenseBtn">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Expense</span>
+          </button>
+          <!-- User Avatar Initials -->
+          <div class="nav-user-avatar" id="navUserAvatar" title="Active User">AL</div>
+        </div>
+
+        <button class="hamburger-btn" id="mobileMenuBtn" aria-label="Toggle Mobile Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-drawer" id="mobileDrawer">
+      <nav class="mobile-nav-links">
+        <a href="#rooms" class="mob-link nav-gateway-link">Rooms</a>
+        <a href="#features" class="mob-link nav-gateway-link">Capabilities</a>
+        <a href="#security" class="mob-link nav-gateway-link">Security</a>
+        <a href="#workspace" class="mob-link nav-workspace-link" style="display: none;">Dashboard</a>
+        <a href="#members-section" class="mob-link nav-workspace-link" style="display: none;">Members</a>
+        <a href="#settlement" class="mob-link nav-workspace-link" style="display: none;">Settlement</a>
+        <a href="#insights" class="mob-link nav-workspace-link" style="display: none;">Insights</a>
+        <div class="mob-actions-row">
+          <button type="button" class="btn-mobile-gateway" id="mobQuickDemoBtn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Load Demo Room
+          </button>
+          <button type="button" class="btn-mobile-cta" id="mobCreateRoomBtn">
+            <i class="fa-solid fa-plus"></i> Create Private Room
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ==========================================================================
+         VIEW 1: ROOM GATEWAY & LANDING PAGE (FIRST SCREEN BEFORE ENTERING ROOM)
+         ========================================================================== -->
+    <div id="landingViewSection">
+      <!-- HERO SECTION -->
+      <section class="wrap hero-graphine">
+        <div class="hero-left">
+          <div class="eyebrow">
+            <span class="pulse"></span>
+            <span>Private expense rooms</span>
+            <span class="rule"></span>
+            <span>v2.1</span>
+          </div>
+
+          <h1>
+            Manage expenses <span class="muted">without the</span> <span class="accent">mess.</span>
+          </h1>
+
+          <div class="rotating-headline">
+            <span class="slash">/</span>
+            <span id="rotatingHeadlineText" class="rotating-text">Split bills instantly.</span>
+          </div>
+
+          <p class="copy">
+            A quiet command center for trips, homes, and teams. Track what happened, split it fairly, and settle with fewer transfers and zero spreadsheet gymnastics.
+          </p>
+
+          <div class="hero-actions">
+            <button type="button" class="button primary" id="heroCreateBtn">
+              <span>Start a private room</span>
+              <i class="fa-solid fa-arrow-up-right"></i>
+            </button>
+            <button type="button" class="button outline" id="heroDemoBtn">
+              <i class="fa-solid fa-wand-magic-sparkles text-lime"></i>
+              <span>Instant Demo Room</span>
+            </button>
+          </div>
+
+          <div class="meta-row">
+            <span><i class="fa-solid fa-shield-halved text-lime"></i> No sign-up required</span>
+            <span><i class="fa-solid fa-lock text-lime"></i> Client-isolated privacy</span>
+            <span><i class="fa-solid fa-bolt text-lime"></i> Greedy min-cash-flow</span>
+          </div>
+        </div>
+
+        <!-- 3D FLOATING WALLET & CARD STAGE -->
+        <div class="stage" aria-label="3D Expense Stage Visual">
+          <div class="orbit"></div>
+          <div class="orbit two"></div>
+
+          <!-- Back Receipt Card -->
+          <div class="card back-card">
+            <span class="card-tag">RECEIPT 04</span>
+            <strong>₹ 4,260</strong>
+            <small>shared / 04 people</small>
+          </div>
+
+          <!-- 3D Neon Lime Wallet -->
+          <div class="wallet-3d">
+            <div class="wallet-top">
+              <span class="chip"></span>
+              <span class="wallet-dots">&bull;&bull;&bull;</span>
+            </div>
+            <div class="wallet-word">ROOM</div>
+            <div class="wallet-id" id="heroWalletId">73KJ91</div>
+            <div class="wallet-bottom">
+              <span>PRIVATE</span>
+              <span>04 MEMBERS</span>
+            </div>
+          </div>
+
+          <!-- Front Live Balance Card -->
+          <div class="card front-card">
+            <div class="live">
+              <i class="live-dot"></i>
+              <span>LIVE ROOM</span>
+              <span class="live-time">02:14</span>
+            </div>
+            <div class="amount" id="heroFrontCardAmount">₹ 12,480<small>.00</small></div>
+            <div class="caption">total tracked this trip</div>
+            <div class="chart-bars">
+              <i style="height: 44%"></i>
+              <i style="height: 76%"></i>
+              <i style="height: 55%"></i>
+              <i style="height: 90%"></i>
+              <i style="height: 66%"></i>
+              <i style="height: 100%"></i>
+              <i style="height: 80%"></i>
+            </div>
+            <div class="footer-line">
+              <span>&uarr; 100% Math Precision</span>
+              <span>Min Transfers</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TICKER MARQUEE STRIP -->
+      <div class="strip">
+        <div class="wrap">
+          <span>EXPENSES, WITHOUT THE SPREADSHEET</span>
+          <span class="dot"></span>
+          <span>MADE FOR REAL LIFE</span>
+          <span class="dot"></span>
+          <span>ONE ROOM. ONE SOURCE OF TRUTH.</span>
+          <span class="dot"></span>
+          <span>GREEDY MIN-CASH-FLOW ALGORITHM</span>
+        </div>
+      </div>
+
+      <!-- ROOM CONTROL & GATEWAY SECTION -->
+      <section class="content" id="rooms">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <div class="kicker">01 / room control</div>
+              <h2>Your group’s<br /><span class="accent">source of truth.</span></h2>
+            </div>
+            <p>
+              Start with a brand new room or join an existing one. The whole flow takes less time than arguing over who paid for the cab.
+            </p>
+          </div>
+
+          <div class="room-grid">
+            <!-- Left Card: Create / Success State -->
+            <div class="room" id="createRoomBox">
+              <form id="createRoomForm" class="room-form">
+                <div class="kicker">new workspace</div>
+                <h3>Name the room.</h3>
+                <p>A trip, a flat, a project, or the group chat that finally got organized.</p>
+
+                <label>
+                  Workspace name
+                  <input type="text" id="createRoomName" placeholder="Goa house, Flat 402, Q4 offsite…" required />
+                </label>
+
+                <label>
+                  Your name
+                  <input type="text" id="createYourName" placeholder="How should we call you?" required />
+                </label>
+
+                <div class="row-2-input">
+                  <label>
+                    Room ID
+                    <input type="text" id="createRoomCode" readonly />
+                  </label>
+                  <label>
+                    Passcode (Optional)
+                    <input type="password" id="createPasscode" placeholder="4-digit PIN" maxlength="6" />
+                  </label>
+                </div>
+
+                <button class="button primary" type="submit">
+                  <span>Generate &amp; Enter Room</span>
+                  <i class="fa-solid fa-arrow-up-right"></i>
+                </button>
+              </form>
+
+              <!-- Success Card -->
+              <div class="success" id="createSuccessBox" style="display: none;">
+                <div class="success-mark"><i class="fa-solid fa-check"></i></div>
+                <div class="kicker">room generated</div>
+                <h3 id="successRoomTitle">Weekend Circle</h3>
+                <p>Your room is private and ready. Share the coordinates with your group.</p>
+                <div class="credentials">
+                  <div>
+                    <span>room id</span>
+                    <strong id="successRoomId">ROOM-73KJ91</strong>
+                  </div>
+                  <div>
+                    <span>passcode</span>
+                    <strong id="successPasscode">UNLOCKED</strong>
+                  </div>
+                </div>
+                <div class="success-actions">
+                  <button type="button" class="button primary" id="enterGeneratedRoomBtn">
+                    <span>Open Room Workspace</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </button>
+                  <button type="button" class="copy-link" id="copyDetailsBtn">
+                    <i class="fa-solid fa-copy"></i> Copy room invite link
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Card: Join Room & Sandbox -->
+            <div class="room">
+              <form id="joinRoomForm" class="room-form">
+                <div class="kicker">join existing</div>
+                <h3>Enter with Room Code.</h3>
+                <p>Have a code from your friend? Enter it below to join the shared expense ledger.</p>
+
+                <label>
+                  Room ID
+                  <input type="text" id="joinRoomCode" placeholder="e.g. ROOM-73KJ91" style="text-transform:uppercase;" required />
+                </label>
+
+                <label>
+                  Passcode / PIN (If set)
+                  <input type="password" id="joinPasscode" placeholder="Enter PIN if required" maxlength="6" />
+                </label>
+
+                <label>
+                  Your name
+                  <input type="text" id="joinYourName" placeholder="e.g. Sam" required />
+                </label>
+
+                <button class="button outline" type="submit" style="width: 100%; margin-top: 18px;">
+                  <span>Join Workspace</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </form>
+
+              <div class="evaluator-demo-box">
+                <div class="kicker text-lime" style="margin-top: 24px;">quick evaluation</div>
+                <button type="button" class="btn-demo-sandbox" id="gatewayDemoBtn">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  <span>Load Evaluator Demo Sandbox</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CAPABILITIES SECTION -->
+      <section class="content features" id="features">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <div class="kicker">02 / the toolkit</div>
+              <h2>All the good parts.<br /><span class="accent">None of the admin.</span></h2>
+            </div>
+          </div>
+
+          <div class="feature-grid">
+            <article class="feature">
+              <strong>01</strong>
+              <i class="fa-solid fa-scale-balanced feature-icon-fa"></i>
+              <h3>Split any way</h3>
+              <p>Equal, custom percentage (sum 100%), or exact rupee shares. Everyone sees the transparent math.</p>
+            </article>
+
+            <article class="feature">
+              <strong>02</strong>
+              <i class="fa-solid fa-shuffle feature-icon-fa"></i>
+              <h3>Settle smarter</h3>
+              <p>Greedy min-cash-flow resolves all debts in the fewest transfers possible. No spreadsheet gymnastics.</p>
+            </article>
+
+            <article class="feature">
+              <strong>03</strong>
+              <i class="fa-solid fa-chart-pie feature-icon-fa"></i>
+              <h3>See the pattern</h3>
+              <p>Interactive Donut &amp; category analytics make group spending immediately legible and clear.</p>
+            </article>
+
+            <article class="feature">
+              <strong>04</strong>
+              <i class="fa-solid fa-lock feature-icon-fa"></i>
+              <h3>Stay private</h3>
+              <p>Rooms stay invisible and isolated. Device B never sees Device A's expenses without the Room Code.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECURITY CLOSING SECTION -->
+      <section class="closing" id="security">
+        <div class="wrap">
+          <div class="kicker">03 / quiet security</div>
+          <h2>Keep the money clear.<br />Keep the moment yours.</h2>
+          <p>Private rooms, simple access, zero signup walls, and no public feed for the details of your life.</p>
+          <button type="button" class="button" id="closingCreateBtn">
+            <span>Create a private room</span>
+            <i class="fa-solid fa-arrow-up-right"></i>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================================================
+         VIEW 2: IN-ROOM EXPENSE DASHBOARD (REVEALED WHEN ROOM IS ACTIVE)
+         ========================================================================== -->
+    <div id="workspaceViewSection" style="display: none;">
+      <section class="section-container" id="workspace">
+        <!-- Active Room Top Banner -->
+        <div class="workspace-banner glass-card">
+          <div class="banner-left">
+            <div class="banner-room-avatar" id="roomAvatarLetter">G</div>
+            <div class="banner-room-info">
+              <div class="banner-title-row">
+                <h2 id="activeRoomTitle">Goa Weekend Trip</h2>
+                <span class="room-code-tag" id="activeRoomCodeBadge">ROOM-73KJ91</span>
+              </div>
+              <p class="banner-subtext">
+                Active Member: <strong id="activeUserName" class="text-lime">Alex</strong> &middot; <span id="activeMemberCountLabel">4 Members</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="banner-actions">
+            <button type="button" class="button primary btn-sm" id="bannerAddExpenseBtn">
+              <i class="fa-solid fa-plus"></i> Add Expense
+            </button>
+            <button type="button" class="btn-banner-action" id="shareRoomBtn" title="Copy Invite Link">
+              <i class="fa-solid fa-link"></i>
+              <span>Copy Link</span>
+            </button>
+            <button type="button" class="btn-banner-action" id="shareRoomModalBtn" title="Share Room">
+              <i class="fa-solid fa-share-nodes"></i>
+              <span>Share</span>
+            </button>
+            <button type="button" class="btn-banner-action btn-danger-subtle" id="switchRoomBtn" title="Switch or Leave room">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Leave Room</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. DASHBOARD SUMMARY CARDS (WITH ANIMATED COUNTERS) -->
+        <div class="dash-metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon icon-lime"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            <div class="metric-details">
+              <span class="metric-label">Total Expense</span>
+              <h4 class="metric-value" id="dashTotalExpense" data-target="0" data-prefix="₹">₹0.00</h4>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon icon-purple"><i class="fa-solid fa-wallet"></i></div>
+            <div class="metric-details">
+              <span class="metric-label">You Paid</span>
+              <h4 class="metric-value" id="dashYouPaid" data-target="0" data-prefix="₹">₹0.00</h4>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon icon-rose"><i class="fa-solid fa-arrow-trend-down"></i></div>
+            <div class="metric-details">
+              <span class="metric-label">You Owe</span>
+              <h4 class="metric-value text-danger" id="dashYouOwe" data-target="0" data-prefix="₹">₹0.00</h4>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon icon-emerald"><i class="fa-solid fa-arrow-trend-up"></i></div>
+            <div class="metric-details">
+              <span class="metric-label">You Receive</span>
+              <h4 class="metric-value text-success" id="dashYouReceive" data-target="0" data-prefix="₹">₹0.00</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. MEMBERS SECTION (ADD MEMBER, AVATAR INITIALS, REMOVE MEMBER, CONTRIBUTION AMOUNT) -->
+        <div class="members-manager-box glass-card" id="members-section">
+          <div class="section-subhead">
+            <div class="subhead-title">
+              <i class="fa-solid fa-users text-lime"></i>
+              <h3>Room Members &amp; Contributions</h3>
+            </div>
+            <span class="members-counter-pill" id="membersCountPill">4 Registered</span>
+          </div>
+
+          <div class="member-add-bar">
+            <form id="addMemberForm" class="member-add-form">
+              <div class="input-with-icon">
+                <i class="fa-solid fa-user-plus"></i>
+                <input type="text" id="newMemberNameInput" placeholder="Add a friend or roommate to this room..." autocomplete="off" required />
+              </div>
+              <button type="submit" class="button primary" id="addMemberBtn">
+                <i class="fa-solid fa-plus"></i>
+                <span>Add Member</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="members-chip-list" id="membersList">
+            <!-- Populated dynamically with avatar colors and contributions -->
+          </div>
+        </div>
+
+        <!-- 3. EXPENSE HISTORY TABLE (SEARCHABLE, CATEGORY ICON, SPLIT, EDIT/DELETE, STICKY HEADER) -->
+        <div class="dash-panel" id="expense-history-section">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <h3><i class="fa-solid fa-receipt text-lime"></i> Expense History</h3>
+              <span class="table-count-badge" id="expenseCountBadge">0 logged</span>
+            </div>
+            <div class="panel-actions-group">
+              <button type="button" class="btn-dark-export" id="exportCsvBtn" title="Export CSV spreadsheet">
+                <i class="fa-solid fa-file-csv"></i> Export CSV
+              </button>
+              <button type="button" class="btn-dark-export" id="exportPdfBtn" title="Export PDF report">
+                <i class="fa-solid fa-file-pdf"></i> Export PDF
+              </button>
+              <button type="button" class="button primary btn-sm" id="openAddModalBtn">
+                <i class="fa-solid fa-plus"></i> Add Expense
+              </button>
+            </div>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="table-filter-bar">
+            <div class="search-input-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="searchExpenseInput" placeholder="Search title, payer, notes..." />
+            </div>
+            <div class="filter-dropdowns">
+              <select id="filterCategorySelect" aria-label="Filter by Category">
+                <option value="ALL">All Categories</option>
+                <option value="Trip">Trip / Travel</option>
+                <option value="Food">Food &amp; Dining</option>
+                <option value="Rent">Rent &amp; Stay</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Fuel">Fuel &amp; Cab</option>
+                <option value="Other">Other</option>
+              </select>
+              <select id="sortExpenseSelect" aria-label="Sort Expenses">
+                <option value="NEWEST">Newest First</option>
+                <option value="OLDEST">Oldest First</option>
+                <option value="AMOUNT_DESC">Highest Amount</option>
+                <option value="AMOUNT_ASC">Lowest Amount</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="table-responsive">
+            <table class="fintech-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Title / Purpose</th>
+                  <th>Paid By</th>
+                  <th>Members Involved</th>
+                  <th class="text-right">Amount</th>
+                  <th>Date</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="expenseTbody">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty State Box (With illustration) -->
+          <div class="empty-state-box" id="emptyExpensesBox" style="display: none;">
+            <div class="empty-icon"><i class="fa-solid fa-receipt"></i></div>
+            <h4>No expenses logged yet</h4>
+            <p>Track your first shared bill in this room with equal or custom split.</p>
+            <button type="button" class="button primary btn-sm" id="emptyAddBtn">
+              <i class="fa-solid fa-plus"></i> Add Your First Expense
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. SMART SETTLEMENT (WHO PAYS WHOM & MINIMUM TRANSACTIONS) -->
+        <div class="settlement-container" id="settlement">
+          <div class="section-header">
+            <span class="section-tag"><i class="fa-solid fa-shuffle"></i> Smart Settlement</span>
+            <h2 class="section-title">Who Pays Whom</h2>
+            <p class="section-subtitle">
+              Calculates the minimum transactions needed to balance everyone's debt to zero.
+            </p>
+          </div>
+
+          <div class="settlement-dashboard-grid">
+            <!-- Member Net Balances -->
+            <div class="glass-card settle-card-box">
+              <div class="panel-header">
+                <h3><i class="fa-solid fa-scale-balanced text-lime"></i> Member Balances</h3>
+                <span class="info-pill" id="balanceStatusPill">Zero-Sum Balanced</span>
+              </div>
+              <div class="balances-summary-list" id="memberBalancesContainer">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+
+            <!-- Optimized Payment Paths -->
+            <div class="glass-card settle-card-box">
+              <div class="panel-header">
+                <h3><i class="fa-solid fa-bolt text-lime"></i> Minimum Settlement Payments</h3>
+                <span class="compare-badge green-badge" id="settleCountBadge">0 Transfers Needed</span>
+              </div>
+              <div class="settle-plan-list" id="optimizedSettlementsContainer">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. MONTHLY INSIGHTS (PIE CHART, BAR CHART, WEEKLY TREND) -->
+        <div class="insights-container" id="insights">
+          <div class="section-header">
+            <span class="section-tag"><i class="fa-solid fa-chart-simple"></i> Monthly Insights</span>
+            <h2 class="section-title">Spending Analytics &amp; Trends</h2>
+            <p class="section-subtitle">Comprehensive visual breakdown powered by Chart.js.</p>
+          </div>
+
+          <div class="charts-triple-grid">
+            <!-- Chart 1: Category Spending Donut/Pie -->
+            <div class="glass-card chart-panel-card">
+              <div class="panel-header">
+                <h3><i class="fa-solid fa-chart-pie text-lime"></i> Category Spending</h3>
+                <span class="badge-live-pulse">Category Pie</span>
+              </div>
+              <div class="chart-canvas-box">
+                <canvas id="categoryDonutChart" width="220" height="220"></canvas>
+              </div>
+              <div class="chart-legend-grid" id="chartLegendGrid"></div>
+            </div>
+
+            <!-- Chart 2: Member Spending Bar Chart -->
+            <div class="glass-card chart-panel-card">
+              <div class="panel-header">
+                <h3><i class="fa-solid fa-chart-column text-lime"></i> Member Spending</h3>
+                <span class="badge-live-pulse">Contributions</span>
+              </div>
+              <div class="chart-canvas-box">
+                <canvas id="memberSpendingBarChart" width="260" height="220"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 3: Weekly Spending Trend Line Chart -->
+            <div class="glass-card chart-panel-card">
+              <div class="panel-header">
+                <h3><i class="fa-solid fa-arrow-trend-up text-lime"></i> Weekly Trend</h3>
+                <span class="badge-live-pulse">Timeline</span>
+              </div>
+              <div class="chart-canvas-box">
+                <canvas id="weeklySpendingTrendChart" width="260" height="220"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ================= 6. LUXURY FOOTER ================= -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-brand-col">
+        <div class="brand-badge-icon">
+          <i class="fa-solid fa-wallet"></i>
+        </div>
+        <span class="brand-name">SplitSmart<span class="brand-dot">.</span></span>
+        <p class="footer-tagline">
+          Intelligent expense splitting and automated settlement optimizer for roommates, trips, and teams.
+        </p>
+        <div class="academic-badge">
+          <i class="fa-solid fa-graduation-cap"></i>
+          <span>MIT-WPU TY CSE &middot; Cloud Computing &amp; DevOps LCA-2</span>
+        </div>
+      </div>
+
+      <div class="footer-nav-col">
+        <h5>Navigation</h5>
+        <ul>
+          <li><a href="#rooms">Room Control</a></li>
+          <li><a href="#features">Capabilities</a></li>
+          <li><a href="#security">Security</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-nav-col">
+        <h5>CI/CD Pipeline</h5>
+        <ul>
+          <li><span>GitHub Version Control</span></li>
+          <li><span>Jenkins CI Pipeline</span></li>
+          <li><span>Docker Containerization</span></li>
+          <li><span>Render Cloud Deployment</span></li>
+        </ul>
+      </div>
+
+      <div class="footer-nav-col">
+        <h5>Live Status</h5>
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn-github-pill">
+          <i class="fa-brands fa-github"></i>
+          <span>GitHub Repo</span>
+        </a>
+        <div class="footer-status-pill">
+          <span class="status-live-dot"></span>
+          <span>Health API: <strong id="footerHealthStatus">UP (200 OK)</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom-bar">
+      <p>&copy; 2026 SplitSmart &middot; MIT-WPU TY CSE CCD LCA-2 &middot; All Rights Reserved.</p>
+      <span class="footer-commit">Build: <code id="footerCommit">v2.1-live</code></span>
+    </div>
+  </footer>
+
+  <!-- ================= 7. ADD EXPENSE MODAL ================= -->
+  <div class="modal-backdrop" id="expenseModal">
+    <div class="modal-box glass-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="badge-icon icon-lime"><i class="fa-solid fa-plus"></i></div>
+          <div>
+            <h3 id="modalTitle">Add Group Expense</h3>
+            <p class="modal-subtitle">Log bill details and choose how to distribute shares</p>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" id="closeModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <!-- Quick Split Templates Bar -->
+      <div class="modal-templates-bar">
+        <span class="template-label"><i class="fa-solid fa-wand-magic-sparkles text-lime"></i> Quick Templates:</span>
+        <div class="template-chips-scroll">
+          <button type="button" class="btn-template-chip" data-category="Trip" data-desc="Flight / Hotel Booking" data-split="EQUAL">
+            ✈️ Trip Booking
+          </button>
+          <button type="button" class="btn-template-chip" data-category="Food" data-desc="Group Dinner / Cafe" data-split="EQUAL">
+            🍕 Team Dinner
+          </button>
+          <button type="button" class="btn-template-chip" data-category="Rent" data-desc="Apartment Rent &amp; Wi-Fi" data-split="EQUAL">
+            🏠 Flat Rent
+          </button>
+          <button type="button" class="btn-template-chip" data-category="Shopping" data-desc="Supermarket Groceries" data-split="EQUAL">
+            🛒 Groceries
+          </button>
+          <button type="button" class="btn-template-chip" data-category="Fuel" data-desc="Petrol &amp; Cab Fare" data-split="EQUAL">
+            ⛽ Fuel / Cab
+          </button>
+        </div>
+      </div>
+
+      <!-- Duplicate Expense Warning Banner -->
+      <div class="duplicate-warning-banner" id="duplicateWarningBanner" style="display: none;">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <div class="dup-text">
+          <strong>Possible Duplicate Expense:</strong>
+          <span id="duplicateWarningText">A similar expense was recorded recently.</span>
+        </div>
+      </div>
+
+      <form id="modalExpenseForm" class="modal-form" novalidate>
+        <input type="hidden" id="editingExpId" value="" />
+
+        <div class="modal-form-grid">
+          <div class="form-field full-col">
+            <label for="mDesc">Expense Title / Purpose</label>
+            <input type="text" id="mDesc" placeholder="e.g. Dinner at Cafe Peter, Flight to Goa, Groceries" required />
+          </div>
+
+          <div class="form-field">
+            <label for="mAmount">Total Amount (₹)</label>
+            <input type="number" id="mAmount" placeholder="0.00" min="0.01" step="0.01" required />
+          </div>
+
+          <div class="form-field">
+            <label for="mPayer">Paid By</label>
+            <select id="mPayer" required>
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="mCategory">Category</label>
+            <select id="mCategory" required>
+              <option value="Trip">✈️ Trip / Vacation</option>
+              <option value="Food">🍔 Food &amp; Dining</option>
+              <option value="Rent">🏠 Stay &amp; Rent</option>
+              <option value="Shopping">🛍️ Shopping</option>
+              <option value="Fuel">⛽ Fuel &amp; Cab</option>
+              <option value="Other">📁 Other</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="mDate">Expense Date</label>
+            <input type="date" id="mDate" required />
+          </div>
+
+          <div class="form-field full-col">
+            <label for="mSplitType">Split Type</label>
+            <select id="mSplitType" required>
+              <option value="EQUAL">⚖️ Equal Split (Divided uniformly)</option>
+              <option value="PERCENTAGE">📊 Percentage Split (Specify % per person)</option>
+              <option value="CUSTOM">💵 Custom Exact Split (Specify exact ₹ per person)</option>
+            </select>
+          </div>
+
+          <div class="form-field full-col">
+            <label for="mNotes">Notes (Optional)</label>
+            <input type="text" id="mNotes" placeholder="Additional details, receipt reference, or note..." />
+          </div>
+        </div>
+
+        <!-- Participants Allocation Box -->
+        <div class="modal-split-box">
+          <div class="modal-split-head">
+            <span class="split-head-title">Participant Allocations</span>
+            <span class="split-head-hint" id="splitModeHint">Uniform share per participant</span>
+          </div>
+
+          <div class="modal-participants-list" id="modalParticipantsContainer">
+            <!-- Injected dynamically -->
+          </div>
+
+          <div class="modal-validation-err" id="modalValidationErr" style="display: none;"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel-modal" id="cancelModalBtn">Cancel</button>
+          <button type="submit" class="button primary" id="saveExpenseBtn">
+            <i class="fa-solid fa-check"></i>
+            <span id="saveBtnText">Save &amp; Split Expense</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
