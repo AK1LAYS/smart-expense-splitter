@@ -289,6 +289,19 @@ describe('Smart Expense Splitter - Comprehensive API Test Suite', () => {
         expect(res.body.data.settlements[0]).toHaveProperty('amount');
       }
     });
+
+    it('9b. should export settlements list with timestamp via /api/settlements/export', async () => {
+      const res = await request(app).get('/api/settlements/export');
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body).toHaveProperty('exportedAt');
+      expect(Array.isArray(res.body.settlements)).toBe(true);
+      if (res.body.settlements.length > 0) {
+        expect(res.body.settlements[0]).toHaveProperty('from');
+        expect(res.body.settlements[0]).toHaveProperty('to');
+        expect(res.body.settlements[0]).toHaveProperty('amount');
+      }
+    });
   });
 
   // Test 10: Analytics Endpoint Check

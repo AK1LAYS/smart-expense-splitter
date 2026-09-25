@@ -34,6 +34,34 @@ const BalanceController = {
         error: 'Failed to calculate balances: ' + error.message
       });
     }
+  },
+
+  // GET /api/settlements/export
+  exportSettlements: (req, res) => {
+    try {
+      const members = ExpenseModel.getMembers();
+      const expenses = ExpenseModel.getAllExpenses();
+
+      const { balances } = SettlementService.calculateNetBalances(members, expenses);
+      const optimized = SettlementService.optimizeSettlements(balances);
+
+      const settlements = (optimized || []).map(s => ({
+        from: s.from,
+        to: s.to,
+        amount: s.amount
+      }));
+
+      res.status(200).json({
+        success: true,
+        exportedAt: new Date().toISOString(),
+        settlements
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to export settlements: ' + error.message
+      });
+    }
   }
 };
 
