@@ -26,18 +26,27 @@ app.use(logger);
 // Serve static frontend files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Health Check Endpoint (Required by Jenkins, Render, and Docker healthcheck)
+/**
+ * GET /health
+ * Service health status & runtime metadata probe
+ * Required by Jenkins CI, Docker container healthcheck, and Render Cloud
+ */
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'UP',
     service: 'smart-expense-splitter',
-    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
     uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
     commit: process.env.GIT_COMMIT || process.env.RENDER_GIT_COMMIT || 'local-build-v1.0'
   });
 });
 
-// Version Endpoint
+/**
+ * GET /api/version
+ * Public API Version Information
+ */
 app.get('/api/version', (req, res) => {
   res.json({
     version: "1.0.0",

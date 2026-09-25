@@ -7,10 +7,18 @@ const express = require('express');
 const router = express.Router();
 const BalanceController = require('../controllers/balanceController');
 
-// GET /api/balances - Get net balance summary and optimized settlements
+/**
+ * @route   GET /api/balances
+ * @desc    Get member net balances and greedy min-cash-flow settlement paths
+ * @access  Public
+ */
 router.get('/balances', BalanceController.getBalances);
 
-// GET /api/settlements/export - Export settlement transactions history
+/**
+ * @route   GET /api/settlements/export
+ * @desc    Export settlement transaction history with ISO server timestamp
+ * @access  Public
+ */
 router.get('/settlements/export', BalanceController.exportSettlements);
 
 module.exports = router;

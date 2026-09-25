@@ -38,6 +38,8 @@ describe('Smart Expense Splitter - Comprehensive API Test Suite', () => {
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty('status', 'UP');
       expect(res.body).toHaveProperty('service', 'smart-expense-splitter');
+      expect(res.body).toHaveProperty('version', '1.0.0');
+      expect(res.body).toHaveProperty('environment');
       expect(res.body).toHaveProperty('uptime');
       expect(res.body).toHaveProperty('timestamp');
     });

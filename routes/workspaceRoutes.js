@@ -19,7 +19,11 @@ const generateRoomId = () => {
   return code;
 };
 
-// 1. POST /api/workspace/create
+/**
+ * @route   POST /api/workspace/create
+ * @desc    Initialize a new private workspace room with scoped auth token
+ * @access  Public
+ */
 router.post('/create', (req, res) => {
   try {
     const { name, yourName, passcode, roomId } = req.body || {};
@@ -56,7 +60,11 @@ router.post('/create', (req, res) => {
   }
 });
 
-// 2. POST /api/workspace/join
+/**
+ * @route   POST /api/workspace/join
+ * @desc    Authenticate and join an existing room session
+ * @access  Public
+ */
 router.post('/join', (req, res) => {
   try {
     const { roomId, passcode, yourName } = req.body || {};

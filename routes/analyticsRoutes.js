@@ -7,13 +7,25 @@ const express = require('express');
 const router = express.Router();
 const AnalyticsController = require('../controllers/analyticsController');
 
-// GET /api/analytics - Get spending insights, highest spender, category breakdown
+/**
+ * @route   GET /api/analytics
+ * @desc    Get dashboard spending insights, highest spender, category breakdown & split types
+ * @access  Public
+ */
 router.get('/analytics', AnalyticsController.getAnalytics);
 
-// GET /api/summary - Get expense summary (totalExpenses, totalMembers)
+/**
+ * @route   GET /api/summary
+ * @desc    Get high-level summary metrics (totalExpenses, totalMembers)
+ * @access  Public
+ */
 router.get('/summary', AnalyticsController.getSummary);
 
-// GET /api/categories - Get category-wise expense analytics
+/**
+ * @route   GET /api/categories
+ * @desc    Get category-wise expense aggregation list for charts and reporting
+ * @access  Public
+ */
 router.get('/categories', AnalyticsController.getCategories);
 
 module.exports = router;
