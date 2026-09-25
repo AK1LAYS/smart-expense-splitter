@@ -98,6 +98,30 @@ const AnalyticsController = {
         error: 'Failed to calculate analytics: ' + error.message
       });
     }
+  },
+
+  // GET /api/summary
+  getSummary: (req, res) => {
+    try {
+      const expenses = ExpenseModel.getAllExpenses();
+      const members = ExpenseModel.getMembers();
+
+      const totalExpenses = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+      const totalMembers = members.length;
+
+      res.status(200).json({
+        success: true,
+        summary: {
+          totalExpenses: Math.round(totalExpenses * 100) / 100,
+          totalMembers
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to calculate summary: ' + error.message
+      });
+    }
   }
 };
 

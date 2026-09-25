@@ -10,4 +10,7 @@ const AnalyticsController = require('../controllers/analyticsController');
 // GET /api/analytics - Get spending insights, highest spender, category breakdown
 router.get('/analytics', AnalyticsController.getAnalytics);
 
+// GET /api/summary - Get expense summary (totalExpenses, totalMembers)
+router.get('/summary', AnalyticsController.getSummary);
+
 module.exports = router;

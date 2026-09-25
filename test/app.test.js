@@ -306,6 +306,21 @@ describe('Smart Expense Splitter - Comprehensive API Test Suite', () => {
     });
   });
 
+  // Test 10b: Expense Summary Endpoint Check
+  describe('GET /api/summary', () => {
+    it('10b. should return totalExpenses sum and totalMembers count', async () => {
+      const res = await request(app).get('/api/summary');
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toEqual({
+        success: true,
+        summary: {
+          totalExpenses: 800,
+          totalMembers: 4
+        }
+      });
+    });
+  });
+
   // Test 11: 404 Route handling
   describe('404 Route Handling', () => {
     it('11. should return 404 JSON for unknown API paths', async () => {
