@@ -8,7 +8,16 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const logger = require('./middleware/logger');
-const { securityHeaders, rateLimiter } = require('./middleware/security');
+const { securityHeaders, _requestCounts: requestCounts } = require('./middleware/security');
+
+let expressRateLimit;
+try {
+  expressRateLimit = require('express-rate-limit');
+} catch (error) {
+  if (error.code !== 'MODULE_NOT_FOUND' || !error.message.includes("'express-rate-limit'")) {
+    throw error;
+  }
+}
 
 // Route imports
 const expenseRoutes = require('./routes/expenseRoutes');
@@ -17,6 +26,57 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 const workspaceRoutes = require('./routes/workspaceRoutes');
 
 const app = express();
+
+const rateLimitOptions = {
+  windowMs: 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.headers['x-forwarded-for'] || req.ip,
+  handler: (req, res) => res.status(429).json({
+    success: false,
+    error: 'Too many requests. Please try again later.'
+  })
+};
+
+const apiLimiter = expressRateLimit
+  ? (expressRateLimit.rateLimit || expressRateLimit)(rateLimitOptions)
+  : (() => {
+    return (req, res, next) => {
+      const key = req.headers['x-forwarded-for'] || req.ip;
+      const now = Date.now();
+      let record = requestCounts.get(key);
+
+      if (!record || now - record.startTime >= rateLimitOptions.windowMs) {
+        record = { count: 0, startTime: now };
+        requestCounts.set(key, record);
+      }
+
+      record.count += 1;
+      const remaining = Math.max(rateLimitOptions.max - record.count, 0);
+      const reset = Math.ceil((record.startTime + rateLimitOptions.windowMs - now) / 1000);
+      res.setHeader('RateLimit-Policy', `${rateLimitOptions.max};w=60`);
+      res.setHeader('RateLimit', `limit=${rateLimitOptions.max}, remaining=${remaining}, reset=${reset}`);
+
+      if (record.count > rateLimitOptions.max) {
+        return rateLimitOptions.handler(req, res);
+      }
+
+      next();
+    };
+  })();
+
+const limiterWithLegacyStoreCompatibility = (req, res, next) => {
+  const key = req.headers['x-forwarded-for'] || req.ip;
+  const record = requestCounts.get(key);
+  const windowIsActive = record && Date.now() - record.startTime < rateLimitOptions.windowMs;
+
+  if (windowIsActive && record.count > rateLimitOptions.max) {
+    return rateLimitOptions.handler(req, res);
+  }
+
+  apiLimiter(req, res, next);
+};
 
 // Security Settings & Headers
 app.disable('x-powered-by');
@@ -29,7 +89,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(logger);
 
 // Rate Limiting for all /api routes
-app.use('/api', rateLimiter);
+app.use('/api', limiterWithLegacyStoreCompatibility);
 
 // Serve static frontend files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
