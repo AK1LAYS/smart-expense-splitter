@@ -8,6 +8,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const logger = require('./middleware/logger');
+const { securityHeaders, rateLimiter } = require('./middleware/security');
 
 // Route imports
 const expenseRoutes = require('./routes/expenseRoutes');
@@ -17,11 +18,18 @@ const workspaceRoutes = require('./routes/workspaceRoutes');
 
 const app = express();
 
+// Security Settings & Headers
+app.disable('x-powered-by');
+app.use(securityHeaders);
+
 // Global Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger);
+
+// Rate Limiting for all /api routes
+app.use('/api', rateLimiter);
 
 // Serve static frontend files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));

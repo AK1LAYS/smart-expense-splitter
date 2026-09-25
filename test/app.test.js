@@ -412,5 +412,42 @@ describe('Smart Expense Splitter - Comprehensive API Test Suite', () => {
     });
   });
 
+  // Test 14: Security Headers & Rate Limiting
+  describe('Security & Rate Limiting Middleware', () => {
+    it('14. should set defensive HTTP security headers on all responses', async () => {
+      const res = await request(app).get('/health');
+      expect(res.headers).toHaveProperty('x-content-type-options', 'nosniff');
+      expect(res.headers).toHaveProperty('x-frame-options', 'SAMEORIGIN');
+      expect(res.headers).toHaveProperty('x-xss-protection', '1; mode=block');
+      expect(res.headers).toHaveProperty('referrer-policy', 'strict-origin-when-cross-origin');
+    });
+
+    it('15. should allow healthcheck and standard API traffic while enforcing rate limits when exceeded', async () => {
+      const { _requestCounts } = require('../middleware/security');
+      const testIp = '198.51.100.42';
+
+      // Set artificially high count for test IP
+      _requestCounts.set(testIp, { count: 301, startTime: Date.now() });
+
+      const limitedRes = await request(app)
+        .get('/api/version')
+        .set('X-Forwarded-For', testIp);
+
+      expect(limitedRes.statusCode).toBe(429);
+      expect(limitedRes.body.success).toBe(false);
+      expect(limitedRes.body.error).toContain('Too many requests');
+
+      // Health check must bypass rate limiter
+      const healthRes = await request(app)
+        .get('/health')
+        .set('X-Forwarded-For', testIp);
+      expect(healthRes.statusCode).toBe(200);
+
+      // Clean up
+      _requestCounts.delete(testIp);
+    });
+  });
+
 });
+
 
