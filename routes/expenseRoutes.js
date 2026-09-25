@@ -20,4 +20,18 @@ router.post('/expenses', validateExpense, ExpenseController.createExpense);
 router.put('/expenses/:id', validateExpense, ExpenseController.updateExpense);
 router.delete('/expenses/:id', ExpenseController.deleteExpense);
 
+// Version Route
+router.get('/version', (req, res) => {
+  res.json({
+    version: "1.0.0",
+    service: "Smart Expense Splitter API"
+  });
+});
+router.get('/api/version', (req, res) => {
+  res.json({
+    version: "1.0.0",
+    service: "Smart Expense Splitter API"
+  });
+});
+
 module.exports = router;

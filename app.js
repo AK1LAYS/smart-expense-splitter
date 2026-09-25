@@ -37,6 +37,14 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Version Endpoint
+app.get('/api/version', (req, res) => {
+  res.json({
+    version: "1.0.0",
+    service: "Smart Expense Splitter API"
+  });
+});
+
 // API Routes
 app.use('/api', expenseRoutes);
 app.use('/api', balanceRoutes);

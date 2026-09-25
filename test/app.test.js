@@ -43,6 +43,18 @@ describe('Smart Expense Splitter - Comprehensive API Test Suite', () => {
     });
   });
 
+  // Test 1b: Version Endpoint Check
+  describe('GET /api/version', () => {
+    it('1b. should return version and service name', async () => {
+      const res = await request(app).get('/api/version');
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toEqual({
+        version: '1.0.0',
+        service: 'Smart Expense Splitter API'
+      });
+    });
+  });
+
   // Test 2: Member Management & Validation
   describe('Member Management APIs', () => {
     it('2. should fetch all members and allow adding a new valid member', async () => {
